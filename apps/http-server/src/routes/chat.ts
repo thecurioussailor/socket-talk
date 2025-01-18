@@ -20,4 +20,4 @@ chatRouter.put('/:chatId/participants/:userId', authenticate, updateParticipantR
 chatRouter.delete('/:chatId/participants/:userId', authenticate, removeParticipantFromChat);
 
 chatRouter.post('/:chatId/invites', authenticate, sendGroupChatInvite);
-  
+
