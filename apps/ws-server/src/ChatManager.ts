@@ -39,11 +39,22 @@ export class ChatManager {
         this.subscriber.subscribe(chatId, (data) => {
             const parsedData = JSON.parse(data.toString());
             const chatUsers = this.subscriptions.get(chatId);
-
+            console.log(parsedData);
+            const sendData = {
+                type: parsedData.type === 'message' ? 'receive_message' : 'typing',
+                payload: {
+                    message: parsedData.message,
+                    chatId: parsedData.chatId
+                },
+                metadata: {
+                    timestamp: new Date(),
+                    senderId: parsedData.senderId
+                }
+            }
             if(chatUsers){
                 for(const user of chatUsers){
                     if(user.getUserId() !== parsedData.senderId){
-                        user.send(parsedData.message);
+                        user.send(JSON.stringify(sendData));
                     }
                 }
             }
@@ -52,7 +63,6 @@ export class ChatManager {
 
     public sendMessageToChat(senderId: string, chatId: string, payloadMessage: {type: string, message: string}){
         const { type, message} = payloadMessage;
-        console.log(payloadMessage);
         console.log("Message",message);
         const payload = JSON.stringify({
             type,

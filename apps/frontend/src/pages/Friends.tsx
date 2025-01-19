@@ -1,21 +1,40 @@
+import FriendTab from "@/components/FriendTab";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
-import { useQuery } from "@tanstack/react-query"
-import axios from "axios"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SearchIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { useState } from "react";
+import UserProfileCard from "@/components/UserProfileCard";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-const Friends = () => {
-
-    const {data, isError, isLoading} = useQuery({
-        queryKey: ["friends"],
-        queryFn: () => {
-            return axios.get(`${BACKEND_URL}/friends`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            })
+interface FriendType {
+    id: string,
+    username: string   
+}
+const fetchFriends = async (): Promise<FriendType[]> => {
+    const response = await axios.get(`${BACKEND_URL}/friends`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
         }
     })
+    return response.data
+}
+const Friends = () => {
+    const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
+    const {data, isError, isLoading} = useQuery({
+        queryKey: ["friends"],
+        queryFn: fetchFriends
+    })
+    const handleProfile = (id: string) => {
+        setSelectedFriendId(id)
+    }
+    if(isLoading){
+        <div>Loading...</div>
+    }
+    if(isError){
+        <div>Error</div>
+    }
   return (
     <section className="bg-[#242627] text-white rounded-lg p-4 h-full">
     <header className="p-4 flex justify-between text-2xl font-semibold">
@@ -27,16 +46,29 @@ const Friends = () => {
             </Button>
         </div>
     </header>
-    <div className="grid grid-cols-2 gap-2">   
-        <div className="flex flex-col justify-start gap-2">
-            {data?.data.map(friend => (
-                <Button className="flex flex-col justify-start items-start h-32" key={friend.id}>
-                    <p className="text-left">{friend.username}</p>
-                </Button>
-            ))}
-        </div>
+    <div className="grid grid-cols-2 gap-4">
+        <Tabs defaultValue="friends" className="w-full">
+            <TabsList>
+                <TabsTrigger value="friends">Friends</TabsTrigger>
+                <TabsTrigger value="pendingrequest">Requests Received</TabsTrigger>
+                <TabsTrigger value="sentrequest">Requests Sent</TabsTrigger>
+            </TabsList>
+            <TabsContent value="friends" className="w-full py-2">
+            <div className="flex flex-col justify-start gap-2">
+                {data?.map(friend => (
+                    <FriendTab  key={friend.id} username={friend.username} onClick={() => handleProfile(friend.id)}/>
+                ))}
+            </div>
+            </TabsContent>
+            <TabsContent value="pendingrequest">Change your password here.</TabsContent>
+            <TabsContent value="sentrequest">Change your password here.</TabsContent>
+        </Tabs>
         <div>
-            friend profile
+            {
+                selectedFriendId && (
+                    <UserProfileCard id={selectedFriendId}/>
+                )
+            }
         </div>
     </div>
 </section>

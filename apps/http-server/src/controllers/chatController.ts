@@ -7,11 +7,15 @@ export const createNewChat = async (req: Request, res: Response) => {
     const { type, name, participantIds, isPrivate } = req.body;
     console.log(participantIds);
     const userId = req.userId;
+    let newName;
     try{
+        if(type === 'PRIVATE'){
+            newName = participantIds[0];
+        }
         const chat = await prismaClient.chat.create({
             data: {
                 type,
-                name,
+                name: newName,
                 isPrivate,
                 participants: {
                     create: [

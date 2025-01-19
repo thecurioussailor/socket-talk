@@ -23,9 +23,10 @@ export const register = async (req: Request, res: Response) => {
     })
 
     if(existingUser){
-        res.status(403).json({
-            message: "User already exist"
-        })
+        res.status(409).json({ // Use 409 Conflict for existing resource
+            error: "UserAlreadyExists",
+            message: "User already exists. Please choose a different username."
+        });
         return
     }
 

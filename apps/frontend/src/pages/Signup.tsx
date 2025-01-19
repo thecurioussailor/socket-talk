@@ -53,10 +53,12 @@ export function Signup() {
       navigate("/signin");
 
     },
-    onError: (data) => {
+    onError: (error) => {
+        const errorMessage = error.message;
+        console.log(error)
         toast({
             title: "Error",
-            description: `Failed to register. ${data.response.data.message}`
+            description: `Failed to register. ${errorMessage}`
         })
     }
   })
