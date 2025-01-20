@@ -1,10 +1,6 @@
 import { prismaClient } from "@repo/prisma/client";
 import { Request, Response } from "express"
 
-export const getAllMessages = async (req: Request, res: Response) => {
-    
-}
-
 export const deleteMessage = async (req: Request, res: Response) => {
     try{
         const { messageId } = req.params;

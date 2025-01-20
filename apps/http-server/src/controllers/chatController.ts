@@ -370,3 +370,68 @@ export const sendGroupChatInvite = async (req: Request, res: Response) => {
         })
     }
 }
+
+
+export const getAllMessagesByChatId = async (req: Request, res: Response) => {
+    try{
+        const { chatId } = req.params;
+        const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+        const { cursor } = req.query;
+        const userId = req.userId;
+
+        const isParticipant = await prismaClient.chatParticipant.findUnique({
+            where: {
+                userId_chatId: {
+                    userId,
+                    chatId
+                }
+            }
+        })
+
+        if(!isParticipant){
+            res.status(403).json({
+                message: "You are not authorized"
+            })
+            return
+        }
+        const chatMessages = await prismaClient.message.findMany({
+            where: {
+                chatId
+            },
+            take: limit,
+           ...(cursor && {
+               cursor: {
+                   id: cursor as string
+               }
+           }),
+            orderBy: {
+                createdAt: 'desc'
+            },
+            include: {
+                sender: {
+                    select: {
+                        id: true,
+                        username: true
+                    }
+                }
+            }
+        })
+
+        if(!chatMessages.length){
+            res.status(404).json({
+                message: "No messages found for this chat"
+            })
+            return
+        };
+        const messages = chatMessages.reverse();
+
+        res.status(200).json({
+            messages,
+            nextCursor: messages.length === limit ? messages[messages.length - 1].id : null, // Next cursor for pagination
+          });
+    }catch(error){
+        res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
+}

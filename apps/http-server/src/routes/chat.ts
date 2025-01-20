@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/authenticate";
-import { addParticipantToChat, createNewChat, deleteChatIfOwner, getChatDetailsAndMessages, getUserChat, removeParticipantFromChat, sendGroupChatInvite, updateChatDetails, updateParticipantRole } from "../controllers/chatController";
+import { addParticipantToChat, createNewChat, deleteChatIfOwner, getAllMessagesByChatId, getChatDetailsAndMessages, getUserChat, removeParticipantFromChat, sendGroupChatInvite, updateChatDetails, updateParticipantRole } from "../controllers/chatController";
 export const chatRouter = Router();
 
 chatRouter.post('/', authenticate, createNewChat);
@@ -20,4 +20,6 @@ chatRouter.put('/:chatId/participants/:userId', authenticate, updateParticipantR
 chatRouter.delete('/:chatId/participants/:userId', authenticate, removeParticipantFromChat);
 
 chatRouter.post('/:chatId/invites', authenticate, sendGroupChatInvite);
+
+chatRouter.get('/:chatId/messages', authenticate, getAllMessagesByChatId);
 

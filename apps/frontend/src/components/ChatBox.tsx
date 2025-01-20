@@ -3,12 +3,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "./ui/badge";
+import MessageBox from "./MessageBox";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 interface ChatDetails {
 
 }
+
 const fetchChatDetails = async (chatId: string | null) => {
     const response = await axios.get(`${BACKEND_URL}/chats/${chatId}`, {
         headers: {
@@ -18,6 +20,7 @@ const fetchChatDetails = async (chatId: string | null) => {
     console.log(response.data)
     return response.data;
 };
+
 
 const ChatBox = ({chatId}: {chatId: string | null}) => {
 
@@ -30,7 +33,6 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
         queryFn: () => fetchChatDetails(chatId),
         enabled: !!chatId,
     })
-
     useEffect(() => {
         const token = localStorage.getItem('token');
 
@@ -93,13 +95,7 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
             </div>
         </div>
         {/* chat messages */}
-        <div className="flex flex-col gap-2 mt-4 w-full h-64 overflow-y-auto bg-zinc-900 p-4 rounded-lg">
-                {/* {messages.map((msg, index) => (
-                    <div key={index} className="text-sm text-white">
-                    {msg}
-                    </div>
-                ))} */}
-        </div>
+        <MessageBox chatId={chatId}/>
         {/* Input section */}
         <div className="flex gap-2 mt-4 w-full">
             <input
