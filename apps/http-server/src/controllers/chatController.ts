@@ -417,13 +417,7 @@ export const getAllMessagesByChatId = async (req: Request, res: Response) => {
             }
         })
 
-        if(!chatMessages.length){
-            res.status(404).json({
-                message: "No messages found for this chat"
-            })
-            return
-        };
-        const messages = chatMessages.reverse();
+        const messages = chatMessages;
 
         res.status(200).json({
             messages,

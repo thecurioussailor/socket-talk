@@ -58,7 +58,10 @@ const Chats = () => {
                 </Button>
             </div>
         </header>
-        <div className="grid grid-flow-col grid-cols-2 justify-start gap-2 w-full">
+        <div className="grid grid-flow-col grid-cols-3 justify-start gap-2 w-full">
+            <div className="">
+                {selectedChatId && <ChatBox chatId={selectedChatId}/>}
+            </div>
             <div className="flex flex-col gap-2">
             {data?.map(chat => (
                 <ChatTab 
@@ -70,9 +73,6 @@ const Chats = () => {
                     onClick={() => handleChatBox(chat.id)}
                 />
             ))}
-            </div>
-            <div>
-                {selectedChatId && <ChatBox chatId={selectedChatId}/>}
             </div>
         </div>
     </section>
