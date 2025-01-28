@@ -8,12 +8,13 @@ import { Badge } from "./ui/badge";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-const fetchProfile = async (id: string) => {
+const fetchUserProfile = async (id: string) => {
     const response = await axios.get(`${BACKEND_URL}/users/${id}`, {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
         }
     })
+    console.log(response.data)
     return response.data;
 
 }
@@ -22,7 +23,7 @@ const UserProfileCard = ({id}: {id: string | null}) => {
 
     const { data, isError, isLoading } = useQuery({
         queryKey: ["users", id],
-        queryFn: () => fetchProfile(id!),
+        queryFn: () => fetchUserProfile(id!),
         enabled: !!id,
       });
 
@@ -37,12 +38,14 @@ const UserProfileCard = ({id}: {id: string | null}) => {
 
   return (
     <section className="flex flex-col justify-between items-center rounded-lg border bg-[#191919] border-zinc-700 overflow-clip pb-4">
-        <div className="relative">
-            <div className="overflow-clip h-36 rounded-t-lg relative">
-                <img src={cover}/>
-                <p className="z-50 absolute text-white top-1 right-4"><Badge>username: {data?.username}</Badge></p>
+        <div className="relative w-full flex justify-center">
+            <div className="overflow-clip h-36 w-full rounded-t-lg relative">
+                <img className="w-full object-cover" src={cover}/>
+                <p className="z-10 absolute text-white top-1 right-4">
+                    <Badge>username: {data?.username}</Badge>
+                </p>
             </div>
-            <div className="absolute -bottom-9 left-64">
+            <div className="absolute -bottom-9">
                 <Avatar className="h-20 w-20">
                     <AvatarImage src="https://github.com/shadcn.png" />
                     <AvatarFallback>CN</AvatarFallback>

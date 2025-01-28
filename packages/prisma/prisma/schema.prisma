@@ -14,21 +14,37 @@ datasource db {
 }
 
 model User {
-  id                String                @id @default(cuid())
-  username          String                @unique
-  password          String    
-  createdAt         DateTime              @default(now())
-  updatedAt         DateTime              @updatedAt
-  friends           Friend[]              @relation("UserAsFriend")
-  friendsWith       Friend[]              @relation("UserFriendsWith")
-  sentRequests      FriendRequest[]       @relation("SentRequests")
-  receivedRequests  FriendRequest[]       @relation("ReceivedRequests")
-  chats             ChatParticipant[]
-  messages          Message[]
-  groupInvitesSent  GroupInvite[]         @relation("GroupInviter") 
-  groupInvitesReceived GroupInvite[]      @relation("GroupInvitee")
+  id                    String                @id @default(cuid())
+  username              String                @unique
+  password              String 
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  friends               Friend[]              @relation("UserAsFriend")
+  friendsWith           Friend[]              @relation("UserFriendsWith")
+  sentRequests          FriendRequest[]       @relation("SentRequests")
+  receivedRequests      FriendRequest[]       @relation("ReceivedRequests")
+  chats                 ChatParticipant[]
+  messages              Message[]
+  groupInvitesSent      GroupInvite[]         @relation("GroupInviter") 
+  groupInvitesReceived  GroupInvite[]         @relation("GroupInvitee")
+  profile               Profile?              @relation("userProfile")
 }
 
+model Profile {
+  id                String           @id @default(cuid())
+  name              String?
+  avatar            String?
+  coverImage        String?
+  bio               String?
+  languages         String[]
+  location          String?
+  instagram         String?
+  x                 String?
+  discord           String?
+  interests         String[]
+  userId            String          @unique
+  user              User            @relation("userProfile", fields: [userId], references: [id])
+}
 model Friend {
   id        String      @id @default(cuid())
   userId    String
@@ -46,7 +62,7 @@ model FriendRequest {
   senderId   String
   receiver   User       @relation("ReceivedRequests", fields: [receiverId], references: [id])
   receiverId String
-  status     String     @default("PENDING")
+  status     Status     @default(PENDING)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
@@ -65,6 +81,7 @@ model Chat {
   isPrivate    Boolean          @default(true)
   participants ChatParticipant[]
   messages     Message[]
+  lastMessageAt DateTime        @default(now())
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
   groupInvites GroupInvite[]

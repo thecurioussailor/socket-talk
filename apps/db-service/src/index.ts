@@ -23,14 +23,24 @@ async function processManager() {
 
                 const {chatId, senderId, message, timeStamp} = parsedData;
 
-                await prismaClient.message.create({
-                    data: {
-                        chatId,
-                        senderId,
-                        content: message,
-                        createdAt: new Date(timeStamp)
-                    }
-                });
+                await prismaClient.$transaction([
+                    prismaClient.message.create({
+                        data: {
+                            chatId,
+                            senderId,
+                            content: message,
+                            createdAt: new Date(timeStamp)
+                        }
+                    }),
+                    prismaClient.chat.update({
+                        where: {
+                            id: chatId
+                        },
+                        data: {
+                            lastMessageAt: new Date(timeStamp)
+                        }
+                    })
+                ])
                 console.log("Message successfully stored in the database");
             }
            

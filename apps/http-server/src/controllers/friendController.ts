@@ -72,6 +72,12 @@ export const getAllFriendRequests = async (req: Request, res: Response) => {
                     senderId: userId
                 },
                 include: {
+                    sender: {
+                        select: {
+                            id: true,
+                            username: true
+                        }
+                    },
                     receiver: {
                         select: {
                             id: true,
@@ -86,6 +92,12 @@ export const getAllFriendRequests = async (req: Request, res: Response) => {
                 },
                 include: {
                     sender: {
+                        select: {
+                            id: true,
+                            username: true
+                        }
+                    },
+                    receiver: {
                         select: {
                             id: true,
                             username: true
@@ -147,6 +159,22 @@ export const respondToFriendRequest = async (req: Request, res: Response) => {
                 },
                 data: {
                     status
+                }
+            }),
+            prismaClient.chat.create({
+                data: {
+                    type: 'PRIVATE',
+                    name: 'personal',
+                    isPrivate: true,
+                    participants: {
+                    create: [
+                        { userId, role: 'OWNER'},
+                        {
+                            userId: request.senderId,
+                            role: 'OWNER'
+                        }
+                    ]
+                }
                 }
             })
         ]);

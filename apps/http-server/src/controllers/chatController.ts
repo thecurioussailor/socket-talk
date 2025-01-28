@@ -63,6 +63,9 @@ export const getUserChat = async (req: Request, res: Response) => {
                     }
                 }
             },
+            orderBy: {
+                lastMessageAt: 'desc'
+            },
             include: {
                 participants: {
                     include: {

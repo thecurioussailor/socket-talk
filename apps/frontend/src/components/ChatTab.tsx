@@ -2,11 +2,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 
-const ChatTab = ({chatId, chatName, lastMessage, chatType, onClick}: {chatId: string, chatName: string, lastMessage: string, chatType: string, onClick: () => void}) => {
+const ChatTab = ({chatId, isSelected, chatName, lastMessage, chatType, onClick}: {chatId: string, isSelected: boolean,chatName: string, lastMessage: string, chatType: string, onClick: () => void}) => {
   return (
     <Button 
         onClick={onClick}
-        className="flex justify-between items-center h-24 rounded-2xl border border-zinc-700"
+        className={`flex justify-between items-center h-24 w-full rounded-2xl border ${isSelected ? 'border-green-500' : 'border-zinc-700'}`}
     >
                     <div className="flex items-center gap-4 p-4">
                         <Avatar>
@@ -15,7 +15,9 @@ const ChatTab = ({chatId, chatName, lastMessage, chatType, onClick}: {chatId: st
                         </Avatar>
                         <div className="flex flex-col">
                             <p className="text-left text-lg">{chatName}</p>
-                            <p className="text-left text-xs">{lastMessage}</p>
+                            {lastMessage && (
+                                 <p className="text-left text-xs">{lastMessage.length < 30 ? lastMessage : `${lastMessage.slice(0,30)}...`}</p>
+                            )}
                         </div>
                     </div>
                     <div>

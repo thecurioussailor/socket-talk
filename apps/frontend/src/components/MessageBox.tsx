@@ -68,13 +68,13 @@ const MessageBox = ({chatId}: {chatId: string | null}) => {
     }
   return (
     <ScrollArea
-        className=" mt-4 w-full h-96 overflow-y-auto bg-zinc-900 p-4"
+        className=" mt-4 w-full h-96 overflow-y-auto bg-zinc-900 p-6"
     >
         {data?.pages.flatMap(page => page.messages).length === 0 && <div className="border rounded-lg justify-between flex gap-2 p-2 mb-2">no messages</div>}
         <Button onClick={() => fetchNextPage()} disabled={!hasNextPage}>Load More</Button>
         {data?.pages.flatMap(page => page.messages).reverse().map((message, index) => (
-            <div key={index} className="justify-between flex gap-2 items-center p-2 mb-2">
-                <div className="border rounded-lg justify-start flex gap-2 items-center p-2 w-96 bg-zinc-800 border-zinc-700">
+            <div key={index} className="flex flex-col mb-4 gap-1">
+                <div className="border rounded-lg justify-start flex gap-2 items-center p-2 bg-zinc-800 w-auto border-zinc-700">
                     <p>
                         <Avatar className="h-8 w-8">
                             <AvatarImage src="https://github.com/shadcn.png" />
@@ -83,7 +83,7 @@ const MessageBox = ({chatId}: {chatId: string | null}) => {
                     </p>
                     <p className="h-auto">{message.content}</p>
                 </div>
-                <p className="text-xs text-zinc-500">{new Date(message.createdAt).toLocaleDateString("en-IN", {
+                <p className="text-xs pl-2 text-zinc-500">{new Date(message.createdAt).toLocaleDateString("en-IN", {
                     timeZone: "Asia/Kolkata", // Set IST (Indian Standard Time) explicitly
                     weekday: "long",           // Show day of the week
                     year: "numeric",          // Show full year
