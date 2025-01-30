@@ -18,6 +18,7 @@ interface Chat {
     name: string;
     isPrivate: Boolean;
     type: 'PRIVATE' | 'GROUP';
+    image: string,
     messages: Message[]
 }
 const fetchChats = async (): Promise<Chat[]> => {
@@ -47,7 +48,7 @@ const Chats = () => {
         setIsDropdownOpen(true);
     }
 
-    const filteredChats = data?.filter(chat => chat.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredChats = data?.filter(chat => chat.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
     if(isLoading){
         return <div>Page is loading</div>
@@ -85,7 +86,7 @@ const Chats = () => {
                                     }} 
                                     className="border-b last:border-none p-2 text-sm cursor-pointer"
                                 >
-                                    {chat.name}
+                                    {chat?.name}
                                 </div>
                             ))
                         ) : (
@@ -108,8 +109,9 @@ const Chats = () => {
                     key={chat.id} 
                     chatId={chat.id}
                     isSelected={selectedChatId == chat.id} 
-                    chatName={chat.name} 
-                    chatType={chat.type} 
+                    chatName={chat?.name} 
+                    chatType={chat?.type}
+                    image={chat?.image} 
                     lastMessage={chat.messages[0]?.content}
                     onClick={() => handleChatBox(chat.id)}
                 />

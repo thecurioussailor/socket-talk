@@ -13,7 +13,11 @@ import FriendSearchTab from "@/components/FriendSearchTab";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 interface FriendType {
     id: string,
-    username: string   
+    username: string,
+    profile: {
+        name: string,
+        avatar: string
+    }
 }
 export const fetchFriends = async (): Promise<FriendType[]> => {
     const response = await axios.get(`${BACKEND_URL}/friends`, {
@@ -21,10 +25,11 @@ export const fetchFriends = async (): Promise<FriendType[]> => {
             Authorization: `Bearer ${localStorage.getItem('token')}`
         }
     })
+    console.log("friends",response.data)
     return response.data
 }
 
-const fetchFriendByUsername = async (username: string) => {
+export const fetchFriendByUsername = async (username: string) => {
     const response = await axios.get(`${BACKEND_URL}/users/search/${username}`, {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -131,7 +136,7 @@ const Friends = () => {
               ) : friendByUsernameData ? (
                 <div className="flex flex-col gap-2">
                   {friendByUsernameData && 
-                        <FriendSearchTab id={friendByUsernameData.id} username={friendByUsernameData.username}/>
+                        <FriendSearchTab id={friendByUsernameData.id} username={friendByUsernameData.username} name={friendByUsernameData.profile.name} avatar={friendByUsernameData.profile.avatar}/>
                   }
                 </div>
               ) : (
@@ -153,7 +158,7 @@ const Friends = () => {
             <div className="flex flex-col justify-start gap-2">
                 {data?.length === 0 && <h1>no friends</h1>}
                 {data?.map(friend => (
-                    <FriendTab  key={friend.id} id={friend.id} username={friend.username} onClick={() => handleProfile(friend.id)}/>
+                    <FriendTab  key={friend.id} id={friend.id} name={friend.profile?.name} username={friend.username} avatar={friend.profile?.avatar} onClick={() => handleProfile(friend.id)}/>
                 ))}
             </div>
             </TabsContent>

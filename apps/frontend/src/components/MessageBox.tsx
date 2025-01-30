@@ -1,9 +1,10 @@
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
+import { fetchProfile, UserDetails } from "@/pages/Profile";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -12,7 +13,11 @@ interface Message {
     content: string,
     sender: {
         id: string,
-        username: string
+        username: string,
+        profile: {
+            name: string,
+            avatar: string
+        }
     };
     createdAt: string
 }
@@ -36,7 +41,7 @@ const fetchChatMessages = async ({ pageParam = null, queryKey} : { pageParam: un
             Authorization: `Bearer ${localStorage.getItem('token')}`
         }
     })
-    console.log(response.data)
+    console.log("messages", response.data)
     return response.data;
 }
 
@@ -56,6 +61,11 @@ const MessageBox = ({chatId}: {chatId: string | null}) => {
         initialPageParam: null
     })
     
+    const { data: profile, isLoading: profileLoading } = useQuery<UserDetails | null>({
+        queryKey: ["profile"],
+        queryFn: fetchProfile
+      });
+
     useEffect(() => {
         scrollRef.current?.scrollIntoView({behavior: 'auto', block: 'end'});
     }, [data])
@@ -73,16 +83,25 @@ const MessageBox = ({chatId}: {chatId: string | null}) => {
         {data?.pages.flatMap(page => page.messages).length === 0 && <div className="border rounded-lg justify-between flex gap-2 p-2 mb-2">no messages</div>}
         <Button onClick={() => fetchNextPage()} disabled={!hasNextPage}>Load More</Button>
         {data?.pages.flatMap(page => page.messages).reverse().map((message, index) => (
-            <div key={index} className="flex flex-col mb-4 gap-1">
-                <div className="border rounded-lg justify-start flex gap-2 items-center p-2 bg-zinc-800 w-auto border-zinc-700">
-                    <p>
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src="https://github.com/shadcn.png" />
-                            <AvatarFallback>{message.sender.username.slice(0,1).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                    </p>
-                    <p className="h-auto">{message.content}</p>
-                </div>
+            <div key={index} className={`flex flex-col justify-end ${profile?.id !== message.sender.id ? 'items-start' : 'items-end'} mb-4 gap-1`}>
+                {
+                        profile?.id === message.sender.id ? (
+                            <div className="border rounded-lg justify-end flex gap-2 items-center p-2 bg-zinc-800 w-auto max-w-xl border-zinc-700">
+                                <p className="h-auto">{message.content}</p>
+                            </div>
+                        ):(
+                            <div className="border rounded-lg justify-start flex gap-3 items-center p-2 bg-zinc-800 w-auto max-w-xl border-zinc-700">
+                    
+                                <p>
+                                    <Avatar className="h-8 w-8">
+                                        <AvatarImage src={message.sender?.profile?.avatar} />
+                                        <AvatarFallback>{message.sender.username.slice(0,1).toUpperCase()}</AvatarFallback>
+                                    </Avatar>
+                                </p>
+                                <p className="h-auto">{message.content}</p>
+                            </div>
+                        )
+                    }
                 <p className="text-xs pl-2 text-zinc-500">{new Date(message.createdAt).toLocaleDateString("en-IN", {
                     timeZone: "Asia/Kolkata", // Set IST (Indian Standard Time) explicitly
                     weekday: "long",           // Show day of the week

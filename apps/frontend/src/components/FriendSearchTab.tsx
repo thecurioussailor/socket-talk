@@ -5,7 +5,6 @@ import { IoMdPersonAdd } from "react-icons/io";
 import { MdFileDownloadDone } from "react-icons/md";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
 import { fetchFriends } from "@/pages/Friends";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -20,7 +19,7 @@ const sendFriendRequest = async (id: string) => {
     return response.data;
 }
 
-const FriendSearchTab = ({ username, id}: {username: string, id: string}) => {
+const FriendSearchTab = ({ username,name, id, avatar}: {username: string, name: string, id: string, avatar: string}) => {
     const { toast } = useToast();
     const queryClient = useQueryClient();
     const {data} = useQuery({
@@ -57,12 +56,13 @@ const FriendSearchTab = ({ username, id}: {username: string, id: string}) => {
             className="p-0"
         >
             <div className="flex items-center gap-4 p-4">
-                <Avatar className="w-6 h-6">
-                    <AvatarImage src="https://github.com/shadcn.png" />
+                <Avatar className="w-8 h-8">
+                    <AvatarImage src={avatar} />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                    <p className="text-left text-sm">{username}</p>
+                    <p className="text-left text-xs">{username}</p>
+                    <p className="text-left text-xs">{name}</p>
                 </div>
             </div>
         </Button>

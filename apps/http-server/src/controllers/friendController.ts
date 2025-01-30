@@ -13,7 +13,13 @@ export const getUsersFriendList = async (req: Request, res: Response) => {
                 friend: {
                     select: {
                         id: true,
-                        username: true
+                        username: true,
+                        profile: {
+                            select: {
+                                name: true,
+                                avatar: true
+                            }
+                        }
                     }
                 }
             }

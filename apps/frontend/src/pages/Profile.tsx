@@ -42,7 +42,7 @@ export const fetchProfile = async (): Promise<UserDetails> => {
             Authorization: `Bearer ${localStorage.getItem('token')}`
         }
     })
-    console.log(response.data)
+    console.log("profile owner",response.data)
     return response.data;
 
 }

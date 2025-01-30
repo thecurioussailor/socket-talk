@@ -11,6 +11,7 @@ import ChatTab from "@/components/ChatTab";
 import { ChangeEvent, useRef, useState } from "react";
 import ChatBox from "@/components/ChatBox";
 import { fetchFriends } from "./Friends";
+import { fetchProfile } from "./Profile";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -18,12 +19,28 @@ interface Message {
     id: string,
     content: string
 }
+
+interface ChatParticipants {
+    chatId: string,
+    user: {
+        id: string,
+        username: string,
+        profile: {
+            name: string,
+            avatar: string
+        }
+    },
+    userId: string
+}
+
 interface Chat {
     id: string;
     name: string;
     isPrivate: Boolean;
     type: 'PRIVATE' | 'GROUP';
-    messages: Message[]
+    image: string,
+    messages: Message[],
+    participants: ChatParticipants[]
 }
 
 const fetchChats = async (): Promise<Chat[]> => {
@@ -32,6 +49,7 @@ const fetchChats = async (): Promise<Chat[]> => {
             Authorization: `Bearer ${localStorage.getItem('token')}`
         }
     })
+    console.log(response.data);
     return response.data
 }
 
@@ -46,10 +64,10 @@ const Personal = () => {
         queryFn: fetchChats
     })
 
-    const { data: friendsList } = useQuery({
-        queryKey: ["friends"],
-        queryFn: fetchFriends
-    })
+    const { data: profile, isLoading: profileLoading } = useQuery({
+        queryKey: ["profile"],
+        queryFn: fetchProfile
+      });
 
     const handleChatBox = (chatId: string) => {
         setSelectedChatId(chatId);
@@ -59,8 +77,7 @@ const Personal = () => {
             setIsDropdownOpen(true);
     }
     
-    const filteredChats = data?.filter(chat => chat.name.toLowerCase().includes(searchQuery.toLowerCase()) && chat.type === 'PRIVATE');
-
+    const filteredChats = data?.filter(chat => chat.name?.toLowerCase().includes(searchQuery.toLowerCase()) && chat.type === 'PRIVATE');
     if(isLoading){
         return <div>Page is loading</div>
     }
@@ -96,7 +113,7 @@ const Personal = () => {
                                     }} 
                                     className="border-b last:border-none p-2 text-sm cursor-pointer"
                                 >
-                                    {chat.name}
+                                    {chat?.name}
                                 </div>
                             ))
                         ) : (
@@ -113,8 +130,8 @@ const Personal = () => {
         <Tabs defaultValue="friends" className="w-full">
             <TabsList>
                 <TabsTrigger value="friends">All</TabsTrigger>
-                <TabsTrigger value="pendingrequest">Archieved</TabsTrigger>
-                <TabsTrigger value="sentrequest">Blocked</TabsTrigger>
+                <TabsTrigger value="archieved">Archieved</TabsTrigger>
+                <TabsTrigger value="blocked">Blocked</TabsTrigger>
             </TabsList>
             <TabsContent value="friends" className="w-full py-2">
                 <div className={`grid grid-flow-col ${selectedChatId ? 'grid-cols-3': 'grid-cols-2'} justify-start gap-4 w-full`}>
@@ -127,8 +144,9 @@ const Personal = () => {
                             key={chat.id} 
                             chatId={chat.id}
                             isSelected={selectedChatId == chat.id} 
-                            chatName={chat.name} 
+                            chatName={chat?.participants.filter(parcipant => parcipant.userId !== profile?.id)[0].user?.profile?.name} 
                             chatType={chat.type} 
+                            image={chat?.participants.filter(parcipant => parcipant.userId !== profile?.id)[0].user?.profile?.avatar}
                             lastMessage={chat.messages[0]?.content}
                             onClick={() => handleChatBox(chat.id)}
                         />
@@ -136,8 +154,8 @@ const Personal = () => {
                     </div>
                 </div>
             </TabsContent>
-            <TabsContent value="pendingrequest">Change your password here.</TabsContent>
-            <TabsContent value="sentrequest">Change your password here.</TabsContent>
+            <TabsContent value="archieved">Change your password here.</TabsContent>
+            <TabsContent value="blocked">Change your password here.</TabsContent>
         </Tabs>
     </div>
 </section>

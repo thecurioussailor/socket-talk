@@ -21,7 +21,7 @@ const removeFriend =  (id: string) => {
     });
 }
 
-const FriendTab = ({ username, id, onClick}: {username: string, id: string, onClick: () => void}) => {
+const FriendTab = ({ username,name , id, avatar, onClick}: {username: string, name: string, id: string, avatar: string, onClick: () => void}) => {
     const { toast } = useToast()
     const queryClient = useQueryClient();
     const { mutate } = useMutation({
@@ -48,11 +48,12 @@ const FriendTab = ({ username, id, onClick}: {username: string, id: string, onCl
         >
             <div className="flex items-center gap-4 p-4">
                 <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarImage src={avatar} />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                    <p className="text-left text-lg">{username}</p>
+                    <p className="text-left text-sm">{name}</p>
+                    <p className="text-left text-xs">{username}</p>
                 </div>
             </div>
         </Button>

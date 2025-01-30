@@ -2,7 +2,7 @@ import { WebSocket } from "ws";
 import { prismaClient } from "@repo/prisma/client";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { ChatManager } from "./ChatManager";
+import { ChatManager, DbUserInfo } from "./ChatManager";
 dotenv.config();
 export interface ChatMessage {
     token: string;
@@ -23,6 +23,10 @@ export interface ChatMessage {
   }
 export class User {
     private dbUserId?: string;
+    private dbUserAvatar?: string | null;
+    private dbNameUser?: string | null;
+    private dbUsername?: string | null;
+
     constructor(
         private id: string, 
         private ws: WebSocket,
@@ -38,10 +42,16 @@ export class User {
         return this.id;
     }
     getUserByDbUserId(dbUserId: string){
-        if(dbUserId === this.dbUserId)
-        return this
+        return dbUserId === this.dbUserId ? this : null;
     }
-
+    getUserInfo (): DbUserInfo{
+        const dbUserInfo = {
+            name: this.dbNameUser ?? "Unknown User",
+            avatar: this.dbUserAvatar ?? "",
+            username: this.dbUsername ?? "anonymous"
+        }
+        return dbUserInfo;
+    }
     async verifyParticipant(chatId: string, dbUserId: string): Promise<boolean> {
         const participant = await prismaClient.chatParticipant.findUnique({
           where: {
@@ -49,8 +59,25 @@ export class User {
               userId: dbUserId,
               chatId: chatId
             }
+          },
+          include: {
+            user: {
+                select: {
+                    id: true,
+                    username: true,
+                    profile: {
+                        select: {
+                            name: true,
+                            avatar: true
+                        }
+                    }
+                }
+            }
           }
         });
+        this.dbUserAvatar = participant?.user.profile?.avatar;
+        this.dbNameUser = participant?.user.profile?.name;
+        this.dbUsername = participant?.user.username;
         return !!participant;
     }
 
@@ -88,7 +115,7 @@ export class User {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
             this.dbUserId = decoded.userId;
-
+            console.log(decoded);
             if (!this.dbUserId || !(await this.verifyParticipant(chatId, this.dbUserId))) {
                 this.ws.close();
                 return;
@@ -118,7 +145,18 @@ export class User {
                 type: "message",
                 message: message
             }
-            ChatManager.getInstance().sendMessageToChat(this.getUserByDbUserId(dbUserId)?.getUserId()!, chatId, payload);
+            const user = this.getUserByDbUserId(dbUserId);
+            console.log(user);
+            if (!user) {
+                console.error(`User with ID ${dbUserId} not found.`);
+                return;
+            }
+            const sender = {
+                senderId: user.getUserId(),
+                dbUserInfo: this.getUserInfo()
+            }
+            console.log(JSON.stringify(sender));
+            ChatManager.getInstance().sendMessageToChat(sender, chatId, payload);
         }catch(error){
             console.error("Failed to handle send message", error)
         }
@@ -151,9 +189,13 @@ export class User {
 
             const payload = {
                 type: "typing_start",
-                message: `${dbUserId} is typing`
+                message: `${this.dbNameUser} is typing`
             }
-            ChatManager.getInstance().sendMessageToChat(this.getUserByDbUserId(dbUserId)?.getUserId()!, chatId, payload)
+            const sender = {
+                senderId: this.getUserByDbUserId(dbUserId)?.getUserId()!,
+                dbUserInfo: this.getUserInfo()
+            }
+            ChatManager.getInstance().sendMessageToChat(sender, chatId, payload)
 
             console.log(`User ${dbUserId} started typing in chat ${chatId}`);
         }catch(error){

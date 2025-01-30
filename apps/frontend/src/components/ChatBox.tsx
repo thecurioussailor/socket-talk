@@ -4,13 +4,30 @@ import axios from "axios";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "./ui/badge";
 import MessageBox from "./MessageBox";
+import { fetchProfile } from "@/pages/Profile";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+interface ChatParticipants {
+    chatId: string,
+    user: {
+        id: string,
+        username: string,
+        profile: {
+            name: string,
+            avatar: string
+        }
+    }
+}
+
 interface ChatDetails {
-    id: string,
-    name: string,
-    type: string
+    id: string;
+    name: string;
+    isPrivate: Boolean;
+    type: 'PRIVATE' | 'GROUP';
+    image: string,
+    messages: Message[],
+    participants: ChatParticipants[]
 }
 
 interface Message {
@@ -23,6 +40,9 @@ interface Message {
     sender: {
         id: string;
         username: string;
+        profile: {
+            avatar: string;
+        }
     };
 }
 
@@ -35,7 +55,7 @@ interface FetchChatMessagesResponse2 {
     nextCursor: string | null;
 }
 
-const fetchChatDetails = async (chatId: string | null) => {
+const fetchChatDetails = async (chatId: string | null): Promise<ChatDetails> => {
     const response = await axios.get(`${BACKEND_URL}/chats/${chatId}`, {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -59,6 +79,12 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
         queryFn: () => fetchChatDetails(chatId),
         enabled: !!chatId,
     })
+
+    const { data: profile, isLoading: profileLoading } = useQuery({
+            queryKey: ["profile"],
+            queryFn: fetchProfile
+    });
+
     useEffect(() => {
         const token = localStorage.getItem('token');
 
@@ -86,22 +112,26 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
             console.log("on message received", data);
 
             if(data.type === "receive_message"){
+                console.log("ws received message....", data)
                 const newMessage: Message = {
                     id: Date.now().toString(),
                     content: data.payload.message,
                     type: "TEXT",
-                    senderId: data.metadata.senderId, // Replace with actual user ID
-                    chatId: data.payload.chatId || "", // Replace with actual chat ID
+                    senderId: data.metadata.senderId, 
+                    chatId: data.payload.chatId || "", 
                     sender: {
-                        id: data.metadata.senderId, // Replace with actual user ID
-                        username: "currentUsername" // Replace with actual username
+                        id: data.metadata.senderId, 
+                        username: data.metadata.sender.dbUserInfo.username,
+                        profile: {
+                            avatar: data.metadata.sender.dbUserInfo.avatar
+                        }
                     },
                     createdAt: new Date().toISOString()
                 };
                 addMessageToCache(newMessage);
             }else if(data.type === "typing"){
                 console.log("typing receive")
-                setIsTyping(data.payload.message); // Update the typing user
+                setIsTyping(data.payload.message);
                 setTimeout(() => setIsTyping(null), 3000);
             }
             
@@ -114,7 +144,6 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
             console.error("WebSocket error:", error);
           };
       
-          // Cleanup WebSocket connection on component unmount
           return () => {
             ws.current?.close();
           };
@@ -140,11 +169,14 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
             id: Date.now().toString(),
             content: messageInput,
             type: "TEXT",
-            senderId: "currentUserId", // Replace with actual user ID
-            chatId: chatId || "", // Replace with actual chat ID
+            senderId: profile?.id!, 
+            chatId: chatId || "", 
             sender: {
-                id: "currentUserId", // Replace with actual user ID
-                username: "currentUsername" // Replace with actual username
+                id: profile?.id!, 
+                username: profile?.username!,
+                profile: {
+                    avatar: profile?.profile?.avatar!
+                }
             },
             createdAt: new Date().toISOString()
         };
@@ -190,16 +222,16 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
         <div className="p-4 flex relative items-center gap-4 bg-zinc-800 w-full rounded-lg">
             <div className="f">
                 <Avatar className="">
-                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarImage src={chatData?.type === 'GROUP' ? chatData?.image : chatData?.participants.filter(participant => participant.user.id !== profile?.id)[0].user.profile.avatar} />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
             </div>
             <div>
-                <h1 className="font-semibold">{chatData.name}  <Badge>{chatData.type}</Badge></h1>
+                <h1 className="font-semibold">{chatData?.type === 'GROUP' ? chatData?.name : chatData?.participants.filter(participant => participant.user.id !== profile?.id)[0].user.profile.name}  <Badge>{chatData?.type}</Badge></h1>
                 <p className="text-sm text-green-300">{isTyping}</p>
             </div>
             <div className="absolute flex flex-col top-1 right-1">
-                <Badge className="text-xs">chat id: {chatData.id}</Badge>
+                <Badge className="text-xs">chat id: {chatData?.id}</Badge>
             </div>
         </div>
         {/* chat messages */}
@@ -218,7 +250,7 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
                     }
                 }}
                 placeholder="Type your message..."
-                className="flex-1 p-2 rounded-lg bg-zinc-800 text-white outline-none"
+                className="flex-1 p-2 rounded-lg bg-zinc-800 text-white outline-none h-auto"
             />
             <button
                 onClick={handleSendMessage}

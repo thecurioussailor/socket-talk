@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 
-const ChatTab = ({chatId, isSelected, chatName, lastMessage, chatType, onClick}: {chatId: string, isSelected: boolean,chatName: string, lastMessage: string, chatType: string, onClick: () => void}) => {
+const ChatTab = ({chatId, isSelected, chatName, image, lastMessage, chatType, onClick}: {chatId: string, isSelected: boolean,chatName: string, image: string, lastMessage: string, chatType: string, onClick: () => void}) => {
   return (
     <Button 
         onClick={onClick}
@@ -10,7 +10,7 @@ const ChatTab = ({chatId, isSelected, chatName, lastMessage, chatType, onClick}:
     >
                     <div className="flex items-center gap-4 p-4">
                         <Avatar>
-                            <AvatarImage src="https://github.com/shadcn.png" />
+                            <AvatarImage src={image} />
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">

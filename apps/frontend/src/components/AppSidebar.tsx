@@ -110,8 +110,8 @@ export function AppSidebar() {
               </Avatar>
             </div>
             <div className="flex flex-col pl-1 pr-2">
-                <p className="text-left">{data?.profile?.name}</p>
-                <p>{data?.username}</p>
+                <p className="text-left text-base">{data?.profile?.name}</p>
+                <p className="text-sm font-medium">{data?.username}</p>
             </div>
             <DropdownMenu>
                 <DropdownMenuTrigger className="border-none"><HiOutlineDotsVertical/></DropdownMenuTrigger>

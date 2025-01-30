@@ -4,10 +4,10 @@ import { Request, Response } from "express";
 // Create new chat (private or group)
 // Required: type (PRIVATE/GROUP), name (for group), participantIds
 export const createNewChat = async (req: Request, res: Response) => {
-    const { type, name, participantIds, isPrivate } = req.body;
+    const { type, name, image, participantIds, isPrivate } = req.body;
     console.log(participantIds);
     const userId = req.userId;
-    let newName;
+    let newName = name;
     try{
         if(type === 'PRIVATE'){
             newName = participantIds[0];
@@ -17,6 +17,7 @@ export const createNewChat = async (req: Request, res: Response) => {
                 type,
                 name: newName,
                 isPrivate,
+                image,
                 participants: {
                     create: [
                         { userId, role: 'OWNER'},
@@ -72,7 +73,13 @@ export const getUserChat = async (req: Request, res: Response) => {
                         user: {
                             select: {
                                 id: true,
-                                username: true
+                                username: true,
+                                profile: {
+                                    select: {
+                                        name: true,
+                                        avatar: true
+                                    }
+                                }
                             }
                         }
                     }
@@ -113,7 +120,13 @@ export const getChatDetailsAndMessages = async (req: Request, res: Response) => 
                         user: {
                             select: {
                                 id: true,
-                                username: true
+                                username: true,
+                                profile: {
+                                    select: {
+                                        name: true,
+                                        avatar: true
+                                    }
+                                }
                             }
                         }
                     }
@@ -414,7 +427,13 @@ export const getAllMessagesByChatId = async (req: Request, res: Response) => {
                 sender: {
                     select: {
                         id: true,
-                        username: true
+                        username: true,
+                        profile: {
+                            select: {
+                                name: true,
+                                avatar: true
+                            }
+                        }
                     }
                 }
             }

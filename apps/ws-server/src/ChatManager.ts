@@ -1,6 +1,16 @@
 import { createClient, RedisClientType } from "redis";
 import { User } from "./User";
 
+export interface DbUserInfo {
+    name: string,
+    avatar: string,
+    username: string
+}
+type Sender = {
+    senderId: string,
+    dbUserInfo: DbUserInfo
+}
+
 export class ChatManager {
     private static instance: ChatManager;
     private subscriptions: Map<string, Set<User>> = new Map();
@@ -48,7 +58,8 @@ export class ChatManager {
                 },
                 metadata: {
                     timestamp: new Date(),
-                    senderId: parsedData.senderId
+                    senderId: parsedData.senderId,
+                    sender: parsedData.sender
                 }
             }
             if(chatUsers){
@@ -61,12 +72,14 @@ export class ChatManager {
         })
     }
 
-    public sendMessageToChat(senderId: string, chatId: string, payloadMessage: {type: string, message: string}){
+    public sendMessageToChat(sender: Sender, chatId: string, payloadMessage: {type: string, message: string}){
         const { type, message} = payloadMessage;
+        const { senderId } = sender;
         console.log("Message",message);
         const payload = JSON.stringify({
             type,
             senderId,
+            sender,
             chatId,
             message
         })

@@ -10,7 +10,19 @@ import { Badge } from "@/components/ui/badge";
 import { ChangeEvent, useState } from "react";
 import ChatBox from "@/components/ChatBox";
 import ChatTab from "@/components/ChatTab";
-
+import { MdGroupAdd } from "react-icons/md";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+  } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { fetchFriendByUsername } from "./Friends";
+import CreateGroupDialog from "@/components/CreateGroupDialog";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 interface Message {
@@ -22,6 +34,7 @@ interface Chat {
     name: string;
     isPrivate: Boolean;
     type: 'PRIVATE' | 'GROUP';
+    image: string,
     messages: Message[]
 }
 
@@ -39,6 +52,8 @@ const Group = () => {
     const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
+    const [search, setSearch] = useState("");
     const { data, isLoading, isError} = useQuery({
         queryKey: ["chats"],
         queryFn: fetchChats
@@ -48,12 +63,12 @@ const Group = () => {
         setSelectedChatId(chatId);
     }
 
-     const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
-                setSearchQuery(e.target.value);
-                setIsDropdownOpen(true);
-        }
-        
-        const filteredChats = data?.filter(chat => chat.name.toLowerCase().includes(searchQuery.toLowerCase()) && chat.type === 'GROUP');
+    const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+        setIsDropdownOpen(true);
+    }
+
+    const filteredChats = data?.filter(chat => chat.name?.toLowerCase().includes(searchQuery.toLowerCase()) && chat.type === 'GROUP');
     
     if(isLoading){
         return <div>Page is loading</div>
@@ -66,16 +81,20 @@ const Group = () => {
     <section className="bg-[#242627] text-white rounded-lg px-4 h-full">
     <header className="p-4 flex justify-between text-2xl font-semibold">
         <h1>Groups</h1>
-        <div className="flex relative items-center gap-2 border rounded-lg p-1 justify-between">
+        <div className="flex items-center gap-4">
+        <Button
+            onClick={() => setIsCreateGroupDialogOpen(true)} 
+            className="bg-zinc-800 border border-zinc-600"
+        >
+            Create Group <MdGroupAdd />
+        </Button>
+        {isCreateGroupDialogOpen && <CreateGroupDialog onClose={() => setIsCreateGroupDialogOpen(false)}/>}
+        <div className="flex relative items-center gap-2 border border-zinc-600 rounded-lg p-1 justify-between">
             <Input
                     onChange={handleSearch} 
                     className="w-56 outline-none border-none focus-visible:ring-0"
-                />
-            <Button 
-                className="bg-transparent hover:bg-transparent"
-            >
-                <SearchIcon/>
-            </Button>
+                    placeholder="Search Group"
+            />
             {isDropdownOpen  && searchQuery && (
                     <div
                         className="absolute top-12 left-0 z-50 w-full border border-zinc-700 rounded-lg bg-[#191919] p-1"
@@ -90,7 +109,7 @@ const Group = () => {
                                     }} 
                                     className="border-b last:border-none p-2 text-sm cursor-pointer"
                                 >
-                                    {chat.name}
+                                    {chat?.name}
                                 </div>
                             ))
                         ) : (
@@ -101,6 +120,7 @@ const Group = () => {
                         </div>
                     </div>
                 )}
+        </div>
         </div>
     </header>
     <div>
@@ -121,8 +141,9 @@ const Group = () => {
                             key={chat.id} 
                             chatId={chat.id}
                             isSelected={selectedChatId == chat.id} 
-                            chatName={chat.name} 
+                            chatName={chat?.name} 
                             chatType={chat.type} 
+                            image={chat?.image}
                             lastMessage={chat.messages[0]?.content}
                             onClick={() => handleChatBox(chat.id)}
                         />

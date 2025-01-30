@@ -76,9 +76,10 @@ enum ChatType {
 
 model Chat {
   id           String            @id @default(cuid())
-  name         String?          
+  name         String?        
   type         ChatType          
   isPrivate    Boolean          @default(true)
+  image        String?
   participants ChatParticipant[]
   messages     Message[]
   lastMessageAt DateTime        @default(now())
