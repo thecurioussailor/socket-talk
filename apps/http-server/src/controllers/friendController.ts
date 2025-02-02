@@ -209,7 +209,20 @@ export const respondToFriendRequest = async (req: Request, res: Response) => {
 export const removeFriend =  async (req: Request, res: Response) => {
     const { friendId } = req.params;
     const userId = req.userId;
-    console.log("friendId userId", friendId, userId)
+    console.log("friendId userId", friendId, userId);
+    const chat = await prismaClient.chat.findFirst({
+        where: {
+            isPrivate: true,
+            participants: {
+                every: {
+                    OR: [{ userId }, { userId: friendId }]
+                }
+            }
+        },
+        select: {
+            id: true
+        }
+    });
     try{
         await prismaClient.$transaction([
             prismaClient.friend.deleteMany({
@@ -233,7 +246,20 @@ export const removeFriend =  async (req: Request, res: Response) => {
                         }
                     ]
                 }
-            })
+            }),
+            ...(chat ? [
+                prismaClient.chatParticipant.deleteMany({
+                    where: {
+                        chatId: chat.id
+                    }
+                }),
+                prismaClient.chat.delete({
+                    where: {
+                        id: chat.id
+                    }
+                })
+            ] : [])
+
         ]);
 
         res.json({

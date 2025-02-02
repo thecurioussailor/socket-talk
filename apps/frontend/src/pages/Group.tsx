@@ -1,28 +1,14 @@
-import FriendTab from "@/components/FriendTab";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SearchIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { ChangeEvent, useState } from "react";
 import ChatBox from "@/components/ChatBox";
 import ChatTab from "@/components/ChatTab";
 import { MdGroupAdd } from "react-icons/md";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-  } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { fetchFriendByUsername } from "./Friends";
 import CreateGroupDialog from "@/components/CreateGroupDialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 interface Message {
@@ -130,12 +116,14 @@ const Group = () => {
                 <TabsTrigger value="pendingrequest">Invites Received</TabsTrigger>
                 <TabsTrigger value="sentrequest">Invites Sent</TabsTrigger>
             </TabsList>
-            <TabsContent value="friends" className="w-full h-auto py-2">
-                <div className={`grid grid-flow-col ${selectedChatId ? 'grid-cols-3': 'grid-cols-2'} justify-start gap-4 w-full`}>
+            <TabsContent value="friends" className="w-full py-2">
+            
+                <div className={`grid grid-flow-col ${selectedChatId ? 'grid-cols-3': 'grid-cols-2'} justify-start gap-4 h-[540px] w-full`}>
                     <div className={`${selectedChatId ? 'col-span-2':'hidden'}`}>
                         {selectedChatId && <ChatBox chatId={selectedChatId}/>}
                     </div>
-                    <div className="flex flex-col gap-1">
+                    <ScrollArea className="px-4 col-span-2">
+                    <div className={`flex flex-col gap-1 h-full ${selectedChatId ? 'w-full' : 'w-1/2'}`}>
                     {data?.filter(chat => chat.type === 'GROUP').map(chat => (
                         <ChatTab 
                             key={chat.id} 
@@ -149,7 +137,9 @@ const Group = () => {
                         />
                     ))}
                     </div>
+                    </ScrollArea>
                 </div>
+        
             </TabsContent>
             <TabsContent value="pendingrequest">Change your password here.</TabsContent>
             <TabsContent value="sentrequest">Change your password here.</TabsContent>

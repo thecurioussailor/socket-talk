@@ -46,7 +46,7 @@ const FriendRequestTab = ({ username, type, id, status, onClick}: {username: str
         onError: (error) => {
             toast({
                 title: "Error while accepting the request",
-                description: "Please try after sometimes"
+                description: "Please try after sometimes" + error
             })
         }
     })

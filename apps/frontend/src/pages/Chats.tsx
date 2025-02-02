@@ -8,18 +8,35 @@ import { useQuery } from "@tanstack/react-query"
 import axios from "axios";
 import { SearchIcon } from "lucide-react";
 import { ChangeEvent, useState } from "react";
+import { fetchProfile, UserDetails } from "./Profile";
+import { ScrollArea } from "@/components/ui/scroll-area";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 interface Message {
     id: string,
     content: string
 }
+
+interface ChatParticipants {
+    chatId: string,
+    user: {
+        id: string,
+        username: string,
+        profile: {
+            name: string,
+            avatar: string
+        }
+    },
+    userId: string
+}
+
 interface Chat {
     id: string;
     name: string;
     isPrivate: Boolean;
     type: 'PRIVATE' | 'GROUP';
     image: string,
-    messages: Message[]
+    messages: Message[],
+    participants: ChatParticipants[]
 }
 const fetchChats = async (): Promise<Chat[]> => {
     const response = await axios.get(`${BACKEND_URL}/chats`,{
@@ -39,6 +56,11 @@ const Chats = () => {
         queryFn: fetchChats
     })
     
+     const { data: profile, isLoading: isProfileLoading} = useQuery<UserDetails | null>({
+            queryKey: ["profile"],
+            queryFn: fetchProfile
+          });
+
     const handleChatBox = (chatId: string) => {
         setSelectedChatId(chatId);
     }
@@ -99,24 +121,26 @@ const Chats = () => {
                 )}
             </div>
         </header>
-        <div className={`grid grid-flow-col ${selectedChatId ? 'grid-cols-3': 'grid-cols-2'} justify-start gap-4 w-full`}>
+        <div className={`grid grid-flow-col ${selectedChatId ? 'grid-cols-3': 'grid-cols-2'} justify-start gap-4 w-full h-5/6`}>
             <div className={`${selectedChatId ? 'col-span-2':'hidden'}`}>
                 {selectedChatId && <ChatBox chatId={selectedChatId}/>}
             </div>
-            <div className="flex flex-col gap-1">
+            <ScrollArea className="px-4 col-span-2">
+            <div className={`flex flex-col gap-1 h-full ${selectedChatId ? 'w-full' : 'w-1/2'}`}>
             {data?.map(chat => (
                 <ChatTab 
                     key={chat.id} 
                     chatId={chat.id}
                     isSelected={selectedChatId == chat.id} 
-                    chatName={chat?.name} 
+                    chatName={chat.type === 'PRIVATE' ? chat.participants.filter(participant => participant.user.username !== profile?.username)[0].user.username : chat.name } 
                     chatType={chat?.type}
-                    image={chat?.image} 
+                    image={chat.type === 'PRIVATE' ? chat.participants.filter(participant => participant.user.username !== profile?.username)[0].user.profile.avatar : chat?.image} 
                     lastMessage={chat.messages[0]?.content}
                     onClick={() => handleChatBox(chat.id)}
                 />
             ))}
             </div>
+            </ScrollArea>
         </div>
     </section>
   )

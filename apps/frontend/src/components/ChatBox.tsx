@@ -5,6 +5,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "./ui/badge";
 import MessageBox from "./MessageBox";
 import { fetchProfile } from "@/pages/Profile";
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "./ui/button";
+import { IoSend } from "react-icons/io5";
+import { Input } from "./ui/input";
+
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -238,8 +243,7 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
         <MessageBox chatId={chatId}/>
         {/* Input section */}
         <div className="flex gap-2 mt-4 w-full">
-            <input
-                type="text"
+            <Input
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -250,15 +254,15 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
                     }
                 }}
                 placeholder="Type your message..."
-                className="flex-1 p-2 rounded-lg bg-zinc-800 text-white outline-none h-auto"
+                className="flex-1 p-3 rounded-lg bg-zinc-800 text-white outline-none border-none focus-visible:ring-zinc-700"
             />
-            <button
+            <Button
                 onClick={handleSendMessage}
-                className="px-4 py-2 bg-green-500 rounded-lg text-white hover:bg-green-600"
-                disabled={isSending}
+                className="px-4 py-2 rounded-lg text-white hover:border-zinc-700"
+                disabled={isSending || messageInput === ""}
             >
-                Send
-            </button>
+                <IoSend/>
+            </Button>
         </div>
     </section>
   )
