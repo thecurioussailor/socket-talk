@@ -29,7 +29,7 @@ const respondToFriendRequest = async (requestId: string) => {
     return response.data;
 }
 
-const FriendRequestTab = ({ username, type, id, status, onClick}: {username: string, type: string, id: string,status: string, onClick: () => void}) => {
+const FriendRequestTab = ({ username, name, avatar, type, id, status, onClick}: {username: string, name: string, avatar: string, type: string, id: string,status: string, onClick: () => void}) => {
     const { toast } = useToast();
     const queryClient = useQueryClient();
     const { mutate } = useMutation({
@@ -52,7 +52,11 @@ const FriendRequestTab = ({ username, type, id, status, onClick}: {username: str
     })
     
     const handleAcceptRequest = () => {
-        mutate(id)
+        mutate(id);
+        toast({
+            title: "Request Accepted Successfully",
+            description: "You have accepted the friend request"
+        })
     }
   return (
     <div className="flex p-2 justify-between items-center h-16 bg-[#191919] rounded-lg border border-zinc-700">   
@@ -62,11 +66,12 @@ const FriendRequestTab = ({ username, type, id, status, onClick}: {username: str
         >
             <div className="flex items-center gap-4 p-4">
                 <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarImage src={avatar} />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
                     <p className="text-left text-lg">{username}</p>
+                    <p className="text-left text-lg">{name}</p>
                 </div>
             </div>
         </Button>

@@ -257,7 +257,7 @@ export const addParticipantToChat = async (req: Request, res: Response) => {
         res.status(201).json(participant)
     }catch(error){
         res.status(500).json({
-            message: "Internal Server Error"
+            message: "Internal Server Error" + error
         })
     }
 }

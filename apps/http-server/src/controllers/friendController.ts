@@ -81,13 +81,25 @@ export const getAllFriendRequests = async (req: Request, res: Response) => {
                     sender: {
                         select: {
                             id: true,
-                            username: true
+                            username: true,
+                            profile: {
+                                select: {
+                                    name: true,
+                                    avatar: true
+                                }
+                            }
                         }
                     },
                     receiver: {
                         select: {
                             id: true,
-                            username: true
+                            username: true,
+                            profile: {
+                                select: {
+                                    name: true,
+                                    avatar: true
+                                }
+                            }
                         }
                     }
                 }

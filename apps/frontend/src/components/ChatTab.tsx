@@ -3,7 +3,8 @@ import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 
 const ChatTab = ({chatId, isSelected, chatName, image, lastMessage, chatType, onClick}: {chatId: string, isSelected: boolean,chatName: string, image: string, lastMessage: string, chatType: string, onClick: () => void}) => {
-  return (
+    
+    return (
     <Button 
         onClick={onClick}
         className={`flex justify-between items-center h-24 w-full rounded-2xl border ${isSelected ? 'border-green-500' : 'border-zinc-700'}`}

@@ -35,7 +35,6 @@ export const fetchFriendByUsername = async (username: string) => {
             Authorization: `Bearer ${localStorage.getItem('token')}`
         }
     })
-    console.log(response.data);
     return response.data;
 }
 
@@ -44,11 +43,19 @@ interface RequestType {
     status: string,
     sender: {
         id: string,
-        username: string
+        username: string,
+        profile: {
+            name: string,
+            avatar: string
+        }
     },
     receiver: {
         id: string,
-        username: string
+        username: string,
+        profile: {
+            name: string,
+            avatar: string
+        }
     }
     createdAt: string
 }
@@ -67,6 +74,7 @@ const fetchFriendRequests = async (): Promise<FriendRequestType> => {
 }
 const Friends = () => {
     const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
+    const [isUserProfileDialogOpen, setIsUserProfileDialogOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -91,7 +99,8 @@ const Friends = () => {
         setIsDropdownOpen(true);
     }
     const handleProfile = (id: string) => {
-        setSelectedFriendId(id)
+        setIsUserProfileDialogOpen(true);
+        setSelectedFriendId(id);
     }
 
     useEffect(() => {
@@ -115,7 +124,7 @@ const Friends = () => {
     <section className="bg-[#242627] text-white rounded-lg p-4 h-full">
     <header className="p-4 flex justify-between text-2xl font-semibold">
         <h1>Friends</h1>
-        <div className="flex relative items-center gap-2 border rounded-lg p-1 justify-between">
+        <div className="flex relative items-center gap-2 border border-zinc-600 rounded-lg p-1 justify-between">
             <Input 
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-56 border-none focus-visible:ring-0"
@@ -165,20 +174,20 @@ const Friends = () => {
             <TabsContent value="pendingrequest" className="w-full py-2">
                 {friendRequestsData?.received?.length === 0 && <h1>no friends</h1>}
                 {friendRequestsData?.received.map(received => (
-                    <FriendRequestTab key={received.id} type={'received'} id={received.id} username={received.sender.username} status={received.status} onClick={() => handleProfile(received.sender.id)}/>
+                    <FriendRequestTab key={received.id} type={'received'} id={received.id} username={received.sender.username} name={received.sender?.profile?.name} avatar={received.sender.profile?.avatar} status={received.status} onClick={() => handleProfile(received.sender.id)}/>
                 ))}
             </TabsContent>
             <TabsContent value="sentrequest" className="w-full py-2 flex flex-col gap-1">
                 {friendRequestsData?.sent?.length === 0 && <h1>no friends</h1>}
                 {friendRequestsData?.sent.map(sent => (
-                    <FriendRequestTab key={sent.id} type={'sent'} id={sent.id} username={sent.receiver.username} status={sent.status} onClick={() => handleProfile(sent.sender.id)}/>
+                    <FriendRequestTab key={sent.id} type={'sent'} id={sent.id} username={sent.receiver.username} name={sent.receiver.profile.name} avatar={sent.receiver.profile.avatar} status={sent.status} onClick={() => handleProfile(sent.receiver.id)}/>
                 ))}
             </TabsContent>
         </Tabs>
         <div>
             {
-                selectedFriendId && (
-                    <UserProfileCard id={selectedFriendId}/>
+                selectedFriendId && isUserProfileDialogOpen && (
+                    <UserProfileCard id={selectedFriendId} onClose={() => setIsUserProfileDialogOpen(false)}/>
                 )
             }
         </div>

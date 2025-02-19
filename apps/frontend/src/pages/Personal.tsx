@@ -89,7 +89,7 @@ const Personal = () => {
     <section className="bg-[#242627] text-white rounded-lg px-4 h-full">
     <header className="p-4 flex justify-between text-2xl font-semibold">
         <h1>Personal</h1>
-        <div className="flex relative items-center gap-2 border rounded-lg p-1 justify-between">
+        <div className="flex relative items-center gap-2 border border-zinc-600 rounded-lg p-1 justify-between">
                 <Input
                     onChange={handleSearch} 
                     className="w-56 outline-none border-none focus-visible:ring-0"
@@ -127,36 +127,25 @@ const Personal = () => {
         </div>
     </header>
     <div className="gap-4">
-        <Tabs defaultValue="friends" className="w-full">
-            <TabsList>
-                <TabsTrigger value="friends">All</TabsTrigger>
-                <TabsTrigger value="archieved">Archieved</TabsTrigger>
-                <TabsTrigger value="blocked">Blocked</TabsTrigger>
-            </TabsList>
-            <TabsContent value="friends" className="w-full py-2">
-                <div className={`grid grid-flow-col ${selectedChatId ? 'grid-cols-3': 'grid-cols-2'} justify-start gap-4 w-full`}>
-                    <div className={`${selectedChatId ? 'col-span-2':'hidden'}`}>
-                        {selectedChatId && <ChatBox chatId={selectedChatId}/>}
-                    </div>
-                    <div className="flex flex-col gap-1">
-                    {data?.filter(chat => chat.type === 'PRIVATE').map(chat => (
-                        <ChatTab 
-                            key={chat.id} 
-                            chatId={chat.id}
-                            isSelected={selectedChatId == chat.id} 
-                            chatName={chat?.participants.filter(parcipant => parcipant.userId !== profile?.id)[0].user?.profile?.name} 
-                            chatType={chat.type} 
-                            image={chat?.participants.filter(parcipant => parcipant.userId !== profile?.id)[0].user?.profile?.avatar}
-                            lastMessage={chat.messages[0]?.content}
-                            onClick={() => handleChatBox(chat.id)}
-                        />
-                    ))}
-                    </div>
-                </div>
-            </TabsContent>
-            <TabsContent value="archieved">Change your password here.</TabsContent>
-            <TabsContent value="blocked">Change your password here.</TabsContent>
-        </Tabs>
+        <div className={`grid grid-flow-col ${selectedChatId ? 'grid-cols-3': 'grid-cols-2'} justify-start gap-4 w-full`}>
+            <div className={`${selectedChatId ? 'col-span-2':'hidden'}`}>
+                {selectedChatId && <ChatBox chatId={selectedChatId}/>}
+            </div>
+            <div className="flex flex-col gap-1">
+            {data?.filter(chat => chat.type === 'PRIVATE').map(chat => (
+                <ChatTab 
+                    key={chat.id} 
+                    chatId={chat.id}
+                    isSelected={selectedChatId == chat.id} 
+                    chatName={chat?.participants.filter(parcipant => parcipant.userId !== profile?.id)[0].user?.profile?.name} 
+                    chatType={chat.type} 
+                    image={chat?.participants.filter(parcipant => parcipant.userId !== profile?.id)[0].user?.profile?.avatar}
+                    lastMessage={chat.messages[0]?.content}
+                    onClick={() => handleChatBox(chat.id)}
+                />
+            ))}
+            </div>
+        </div>
     </div>
 </section>
   )

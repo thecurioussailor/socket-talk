@@ -110,13 +110,7 @@ const Group = () => {
         </div>
     </header>
     <div>
-        <Tabs defaultValue="friends" className="w-full">
-            <TabsList>
-                <TabsTrigger value="friends">Groups</TabsTrigger>
-                <TabsTrigger value="pendingrequest">Invites Received</TabsTrigger>
-                <TabsTrigger value="sentrequest">Invites Sent</TabsTrigger>
-            </TabsList>
-            <TabsContent value="friends" className="w-full py-2">
+        
             
                 <div className={`grid grid-flow-col ${selectedChatId ? 'grid-cols-3': 'grid-cols-2'} justify-start gap-4 h-[540px] w-full`}>
                     <div className={`${selectedChatId ? 'col-span-2':'hidden'}`}>
@@ -139,11 +133,6 @@ const Group = () => {
                     </div>
                     </ScrollArea>
                 </div>
-        
-            </TabsContent>
-            <TabsContent value="pendingrequest">Change your password here.</TabsContent>
-            <TabsContent value="sentrequest">Change your password here.</TabsContent>
-        </Tabs>
     </div>
 </section>
   )

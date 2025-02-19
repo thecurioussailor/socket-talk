@@ -1,5 +1,12 @@
 import { Calendar, Home, Inbox, Settings } from "lucide-react"
-
+import { IoHomeSharp } from "react-icons/io5";
+import { IoMdHome } from "react-icons/io";
+import { IoChatbubbles } from "react-icons/io5";
+import { FaPeopleGroup } from "react-icons/fa6";
+import { MdGroups } from "react-icons/md";
+import { MdGroup } from "react-icons/md";
+import { IoPersonAdd } from "react-icons/io5";
+import { IoMdSettings } from "react-icons/io";
 import {
   Sidebar,
   SidebarContent,
@@ -19,39 +26,40 @@ import { fetchProfile } from "@/pages/Profile"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { HiOutlineDotsVertical } from "react-icons/hi"
 import { toast, useToast } from "@/hooks/use-toast"
-
+import { FaUser } from "react-icons/fa"
+import { FiLogOut } from "react-icons/fi";
 
 // Menu items.
 const items = [
   {
     title: "Home",
     url: "/dashboard",
-    icon: Home,
+    icon: IoMdHome,
   },
   {
     title: "All Chats",
     url: "/chats",
-    icon: Inbox,
+    icon: IoChatbubbles,
   },
   {
     title: "Personal",
     url: "/personal",
-    icon: Inbox,
+    icon: MdGroup,
   },
   {
     title: "Groups",
     url: "/groups",
-    icon: Inbox,
+    icon: MdGroups,
   },
   {
     title: "Friends",
     url: "/friends",
-    icon: Calendar,
+    icon: IoPersonAdd,
   },
   {
     title: "Settings",
     url: "/settings",
-    icon: Settings,
+    icon: IoMdSettings,
   },
 ]
 
@@ -91,7 +99,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title} className="p-1">
                   <SidebarMenuButton className="text-xl" asChild>
                     <Link to={item.url}>
-                      <item.icon />
+                      <item.icon/>
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -102,7 +110,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="bg-[#151718] py-4">
-        <Button className="flex items-center justify-between rounded-lg h-14 hover:bg-gray-500">
+        <div className="flex items-center justify-between rounded-lg h-14 p-4 hover:bg-zinc-800 cursor-pointer">
             <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full">
               <Avatar>
                   <AvatarImage src={data?.profile?.avatar} />
@@ -110,19 +118,31 @@ export function AppSidebar() {
               </Avatar>
             </div>
             <div className="flex flex-col pl-1 pr-2">
-                <p className="text-left text-base">{data?.profile?.name}</p>
-                <p className="text-sm font-medium">{data?.username}</p>
+                <p className="text-left text-base text-white">{data?.profile?.name}</p>
+                <p className="text-sm font-medium text-white">{data?.username}</p>
             </div>
             <DropdownMenu>
-                <DropdownMenuTrigger className="border-none"><HiOutlineDotsVertical/></DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuTrigger className="border-none text-white"><HiOutlineDotsVertical/></DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-zinc-800 border-none">
                   <Link to={'/profile'}>
-                    <DropdownMenuItem className="cursor-pointer">Profile</DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer focus:bg-zinc-700">
+                        <div className="text-white flex items-center gap-2">
+                          <FaUser/>
+                          <span>Profile</span>
+                        </div>
+                    </DropdownMenuItem>
                   </Link>  
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">Logout</DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={handleLogout} 
+                    className="cursor-pointer focus:bg-zinc-700">
+                        <div className="text-white flex items-center gap-2">
+                          <FiLogOut />
+                          <span>Logout</span>
+                        </div>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-        </Button>
+        </div>
       </SidebarFooter>
     </Sidebar>
   )

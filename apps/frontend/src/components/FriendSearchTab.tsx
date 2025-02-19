@@ -68,7 +68,7 @@ const FriendSearchTab = ({ username,name, id, avatar}: {username: string, name: 
         </Button>
         <div className="flex items-center pr-2">
             {data?.some(friend => friend.username === username) ? (
-                <Button><MdFileDownloadDone /></Button>
+                <Button><MdFileDownloadDone/></Button>
             ): (
                 <Button onClick={handleSendRequest}><IoMdPersonAdd /></Button>
             )}

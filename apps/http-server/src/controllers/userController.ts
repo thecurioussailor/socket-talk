@@ -1,5 +1,6 @@
 import { prismaClient } from "@repo/prisma/client";
 import { Request, Response } from "express";
+import bcrypt from "bcrypt";
 
 export const getUserProfile = async (req: Request, res: Response) => {
     const userId = req.userId;
@@ -79,6 +80,55 @@ export const updateUserProfile = async ( req: Request, res: Response ) => {
         })
     }
 }
+
+export const resetPassword = async (req: Request, res: Response) => {
+    try {
+        const { oldPassword, newPassword} = req.body;
+        const userId = req.userId;
+
+        const user = await prismaClient.user.findUnique({
+            where: {
+                id: userId
+            }
+        })
+        if(!user){
+            res.status(404).json({
+                message: "User not found"
+            })
+            return
+        }
+
+        const isOldPasswordVerified = await bcrypt.compare(oldPassword, user.password);
+
+        if(!isOldPasswordVerified){
+            res.status(400).json({
+                message: "You provided wrong password"
+            })
+            return
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        await prismaClient.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                password: hashedNewPassword
+            }
+        })
+
+        res.status(200).json({
+            message: "Your password has been changed"
+        })
+        
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
+}
+
 export const getUserProfileById = async (req: Request, res: Response) => {
     const { userId } = req.params;
     try{

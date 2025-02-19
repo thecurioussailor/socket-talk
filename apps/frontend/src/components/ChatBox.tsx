@@ -9,12 +9,25 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "./ui/button";
 import { IoSend } from "react-icons/io5";
 import { Input } from "./ui/input";
-
+import { HiOutlineDotsVertical } from "react-icons/hi";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu"
+import { FaInfo, FaUser } from "react-icons/fa";
+import ChatInfoDialogBox from "./ChatInfoDialogBox";
+import ChatParticipantsDialog from "./ChatParticipantsDialog";
+import UserProfileCard from "./UserProfileCard";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-interface ChatParticipants {
+export interface ChatParticipants {
     chatId: string,
+    role: "OWNER" | "MEMBER" | "ADMIN"
     user: {
         id: string,
         username: string,
@@ -31,7 +44,9 @@ interface ChatDetails {
     isPrivate: Boolean;
     type: 'PRIVATE' | 'GROUP';
     image: string,
-    messages: Message[],
+    lastMessageAt: Date,
+    createdAt: string,
+    updatedAt: string,
     participants: ChatParticipants[]
 }
 
@@ -60,7 +75,7 @@ interface FetchChatMessagesResponse2 {
     nextCursor: string | null;
 }
 
-const fetchChatDetails = async (chatId: string | null): Promise<ChatDetails> => {
+export const fetchChatDetails = async (chatId: string | null): Promise<ChatDetails> => {
     const response = await axios.get(`${BACKEND_URL}/chats/${chatId}`, {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -76,6 +91,10 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
     const [messageInput, setMessageInput] = useState("");
     const [isTyping, setIsTyping] = useState<string | null>(null);
     const [isSending, setIsSending] = useState(false);
+    const [isChatInfoDialogOpen, setIsChatInfoDialogOpen] = useState(false);
+    const [isChatParticipantDialogOpen, setIsChatParticipantDialogOpen] = useState(false);
+    const [isUserProfileDialogOpen, setIsUserProfileDialogOpen] = useState(false);
+    const [privateUserId, setPrivateUserId] = useState("");
     const ws = useRef<WebSocket | null>(null);
     const queryClient = useQueryClient();
 
@@ -218,26 +237,86 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
         });
     };
 
+    const handleChatInfo = () => {
+        setIsChatInfoDialogOpen(true);
+    }
 
     if (isLoading) {
         return <p>Loading...</p>;
       }
   return (
     <section className="flex flex-col justify-between items-center rounded-lg border p-4 bg-[#191919] border-zinc-700 overflow-clip pb-4">
-        <div className="p-4 flex relative items-center gap-4 bg-zinc-800 w-full rounded-lg">
-            <div className="f">
-                <Avatar className="">
-                    <AvatarImage src={chatData?.type === 'GROUP' ? chatData?.image : chatData?.participants.filter(participant => participant.user.id !== profile?.id)[0].user.profile.avatar} />
-                    <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
+        <div className="p-4 flex relative items-center justify-between gap-4 bg-zinc-800 w-full rounded-lg">
+            <div className="flex gap-4 items-center">
+                <div>
+                    <Avatar>
+                        <AvatarImage src={chatData?.type === 'GROUP' ? chatData?.image : chatData?.participants.filter(participant => participant.user.id !== profile?.id)[0].user.profile.avatar} />
+                        <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                </div>
+                <div>
+                    <h1 className="font-semibold">{chatData?.type === 'GROUP' ? chatData?.name : chatData?.participants.filter(participant => participant.user.id !== profile?.id)[0].user.profile.name}  <Badge>{chatData?.type}</Badge></h1>
+                    <p className="text-sm text-green-300">{isTyping}</p>
+                </div>
             </div>
-            <div>
-                <h1 className="font-semibold">{chatData?.type === 'GROUP' ? chatData?.name : chatData?.participants.filter(participant => participant.user.id !== profile?.id)[0].user.profile.name}  <Badge>{chatData?.type}</Badge></h1>
-                <p className="text-sm text-green-300">{isTyping}</p>
-            </div>
-            <div className="absolute flex flex-col top-1 right-1">
-                <Badge className="text-xs">chat id: {chatData?.id}</Badge>
-            </div>
+            { chatData?.type === 'GROUP' ? (
+                <DropdownMenu>
+                <DropdownMenuTrigger className="hover:bg-zinc-700 p-2 rounded-full"><HiOutlineDotsVertical/></DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-zinc-800 border-none">
+                    <DropdownMenuItem className="cursor-pointer focus:bg-zinc-700">
+                            <div 
+                                onClick={() => {
+                                    setIsChatParticipantDialogOpen(true);
+                                }}
+                                className="text-white flex items-center gap-2 bg-transparent">
+                                <FaUser/>
+                                <span>
+                                    Participants
+                                </span>
+                            </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer focus:bg-zinc-700">
+                            <div 
+                                onClick={handleChatInfo}
+                                className="text-white flex items-center gap-2 bg-transparent">
+                                <FaInfo/>
+                                <span>
+                                    Chat Info
+                                </span>
+                            </div>
+                        </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            ): (
+                <DropdownMenu>
+                    <DropdownMenuTrigger className="hover:bg-zinc-700 p-2 rounded-full"><HiOutlineDotsVertical/></DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-zinc-800 border-none">
+                        <DropdownMenuItem className="cursor-pointer focus:bg-zinc-700">
+                            <div 
+                                onClick={() => {
+                                    setPrivateUserId(chatData?.participants.filter(participant => participant.user.id !== profile?.id)[0].user.id || "");
+                                    setIsUserProfileDialogOpen(true);
+                                }}
+                                className="text-white flex items-center gap-2 bg-transparent"
+                            >
+                                <FaUser/>
+                                <span>Profile</span>
+                            </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer focus:bg-zinc-700">
+                            <div 
+                                onClick={handleChatInfo}
+                                className="text-white flex items-center gap-2 bg-transparent">
+                                <FaInfo/>
+                                <span>
+                                    Chat Info
+                                </span>
+                            </div>
+
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )}
         </div>
         {/* chat messages */}
         <MessageBox chatId={chatId}/>
@@ -264,6 +343,15 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
                 <IoSend/>
             </Button>
         </div>
+        {
+            isChatInfoDialogOpen && <ChatInfoDialogBox chatId={chatId} onClose={() => setIsChatInfoDialogOpen(false)}/>
+        }
+        {
+            isChatParticipantDialogOpen && <ChatParticipantsDialog chatId={chatData?.id!} chatParticipants={chatData?.participants ?? []} onClose={() => setIsChatParticipantDialogOpen(false)}/>
+        }
+        {
+            isUserProfileDialogOpen && <UserProfileCard id={privateUserId} onClose={() => setIsUserProfileDialogOpen(false)}/>
+        }
     </section>
   )
 }

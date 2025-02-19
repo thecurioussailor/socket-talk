@@ -1,21 +1,68 @@
-import FriendTab from "@/components/FriendTab";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SearchIcon } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import ChatBox from "@/components/ChatBox";
-import ChatTab from "@/components/ChatTab";
+import { FormEvent, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+const changePassword = async (passwordData: { oldPassword: string, newPassword: string}) => {
+    const response = await axios.put(`${BACKEND_URL}/users/reset-password`, passwordData, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+    })
+    return response.data;
+}
 
 const Settings = () => {
    
+    const { toast } = useToast();
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: changePassword,
+        onSuccess: () => {  
+            toast({
+                title: "Password Change Successfull",
+                description: "Your password has been changed."
+            })
+            setOldPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+        },
+        onError: () => {
+            toast({
+                title: "Error while changing Password",
+                description: "Your password cannot be changed please try after sometimes"
+            })
+        }
+    })
+
+      const handleFormSubmit = (e: FormEvent) => {
+            e.preventDefault();
+            if(!oldPassword || !newPassword || !confirmPassword){
+                toast({
+                    title: "Missing Fields",
+                    description: "Please fill in all fields",
+                    variant: "destructive"
+                })
+                return;
+            }
+
+            if(newPassword !== confirmPassword){
+                toast({
+                    title: "Passwords Do Not Match",
+                    description: "Please fill correct passwords",
+                    variant: "destructive"
+                });
+                return;
+            }
+            mutate({oldPassword, newPassword});
+        }
     
   return (
     <section className="bg-[#242627] text-white rounded-lg px-4 h-full">
@@ -23,18 +70,38 @@ const Settings = () => {
         <h1>Settings</h1>
     </header>
     <div>
-        <Tabs defaultValue="friends" className="w-full">
-            <TabsList>
-                <TabsTrigger value="friends">Themes</TabsTrigger>
-                <TabsTrigger value="pendingrequest">Change Password</TabsTrigger>
-                <TabsTrigger value="sentrequest">Invites Sent</TabsTrigger>
-            </TabsList>
-            <TabsContent value="friends" className="w-full h-auto py-2">
-                
-            </TabsContent>
-            <TabsContent value="pendingrequest">Change your password here.</TabsContent>
-            <TabsContent value="sentrequest">Change your password here.</TabsContent>
-        </Tabs>
+        <div className="px-4 flex flex-col gap-4">
+            <h1 className="font-semibold">Change Password</h1>
+            <form onSubmit={handleFormSubmit} className="flex flex-col gap-2 w-96 ">
+                <Input 
+                    type="password"
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    className="border-none focus-visible:ring-zinc-600" 
+                    placeholder="Old Password"
+                />
+                <Input 
+                    type="password"
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="border-none focus-visible:ring-zinc-600" 
+                    placeholder="New Password"
+                />
+                <Input 
+                    type="password"
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="border-none focus-visible:ring-zinc-600" 
+                    placeholder="Confirm New Password"
+                />
+                <div>
+                    <Button 
+                        type="submit" 
+                        className="border border-zinc-600 bg-zinc-950 hover:bg-zinc-900"
+                        disabled={isPending}
+                    >
+                        Save
+                    </Button>
+                </div>
+            </form>
+        </div>
     </div>
 </section>
   )
