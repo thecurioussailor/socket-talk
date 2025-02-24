@@ -1,0 +1,101 @@
+services:
+  # Database Service
+  postgres:
+    image: postgres:15
+    container_name: socket-talk-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Service (for queue processing)
+  redis:
+    image: redis:latest
+    container_name: socket-talk-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API Server
+  http-server:
+    build:
+      context: .
+      dockerfile: apps/http-server/Dockerfile
+    container_name: http-server-st
+    restart: always
+    env_file:
+      - packages/prisma/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+  # WebSocket Server
+  ws-server:
+    build:
+      context: .
+      dockerfile: apps/ws-server/Dockerfile
+    container_name: ws-server-st
+    restart: always
+    env_file:
+      - packages/prisma/.env
+    depends_on:
+      http-server:
+        condition: service_started
+    ports:
+      - "3001:3001"
+
+  # Database Processing Service (Queue Consumer)
+  db-service:
+    build:
+      context: .
+      dockerfile: apps/db-service/Dockerfile
+    container_name: db-service-st
+    restart: always
+    env_file:
+      - apps/db-service/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Frontend React + Vite App
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    container_name: frontend-st
+    restart: always
+    depends_on:
+      http-server:
+        condition: service_started
+    ports:
+      - "5173:5173"
+    env_file:
+      - apps/frontend/.env
+
+# Persistent volumes for PostgreSQL and Redis
+volumes:
+  postgres-data:
+  redis-data:

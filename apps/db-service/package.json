@@ -5,13 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsc -b && node dist/index.js"
+    "dev": "tsc -b && node dist/index.js",
+    "start": "node dist/index.js",
+    "build": "tsc -b"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@repo/prisma": "workspace:*",
+    "@types/dotenv": "^8.2.3",
+    "dotenv": "^16.4.7",
     "redis": "^4.7.0",
     "typescript": "^5.7.3"
   }

@@ -4,18 +4,17 @@ import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "./ui/badge";
 import { FaCheck } from "react-icons/fa";
-import { RiDeleteBinLine } from "react-icons/ri";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-const removeRequest =  (requestId: string) => {
-    return axios.delete(`${BACKEND_URL}/friends/${requestId}`, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-    });
-}
+// const removeRequest =  (requestId: string) => {
+//     return axios.delete(`${BACKEND_URL}/friends/${requestId}`, {
+//         headers: {
+//             Authorization: `Bearer ${localStorage.getItem('token')}`
+//         }
+//     });
+// }
 
 const respondToFriendRequest = async (requestId: string) => {
     const response = await axios.put(`${BACKEND_URL}/friends/requests/${requestId}`, {

@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { FormEvent, useEffect, useState } from "react";
-import { toast, useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 interface ProfileData {

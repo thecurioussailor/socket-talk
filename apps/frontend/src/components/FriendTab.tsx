@@ -36,7 +36,7 @@ const FriendTab = ({ username,name , id, avatar, onClick}: {username: string, na
     onError: (error) => {
         toast({
             title: "Friend Not Removed",
-            description: "Error while removing try after sometimes",
+            description: "Error while removing try after sometimes" + error,
           })
     }
    })

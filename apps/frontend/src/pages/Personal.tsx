@@ -1,16 +1,11 @@
-import FriendTab from "@/components/FriendTab";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SearchIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import ChatTab from "@/components/ChatTab";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import ChatBox from "@/components/ChatBox";
-import { fetchFriends } from "./Friends";
 import { fetchProfile } from "./Profile";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -58,13 +53,13 @@ const Personal = () => {
     const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    // const dropdownRef = useRef<HTMLDivElement>(null);
     const { data, isLoading, isError} = useQuery({
         queryKey: ["chats"],
         queryFn: fetchChats
     })
 
-    const { data: profile, isLoading: profileLoading } = useQuery({
+    const { data: profile } = useQuery({
         queryKey: ["profile"],
         queryFn: fetchProfile
       });

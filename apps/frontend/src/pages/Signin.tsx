@@ -55,10 +55,10 @@ export function Signin() {
         navigate('/dashboard');
 
     },
-    onError: (data) => {
+    onError: (error) => {
         toast({
             title: "Error",
-            description: "Failed to login. Please check your credentials"
+            description: "Failed to login. Please check your credentials" + error
         })
     }
   })

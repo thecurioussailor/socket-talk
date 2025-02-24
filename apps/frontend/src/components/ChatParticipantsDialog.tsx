@@ -88,7 +88,7 @@ const ChatParticipantsDialog = ({chatId, chatParticipants, onClose}: {chatId: st
                               <AvatarFallback>CN</AvatarFallback>
                             </Avatar>
                             <div>
-                              <p>{participant?.user?.profile?.name}</p>
+                              <p>{participant?.user?.profile?.name}<span className="pl-2">({participant?.user?.username})</span></p>
                               <p className="text-xs lowercase">{participant?.role}</p>
                             </div>
                         </div>

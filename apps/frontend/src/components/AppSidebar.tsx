@@ -1,8 +1,5 @@
-import { Calendar, Home, Inbox, Settings } from "lucide-react"
-import { IoHomeSharp } from "react-icons/io5";
 import { IoMdHome } from "react-icons/io";
 import { IoChatbubbles } from "react-icons/io5";
-import { FaPeopleGroup } from "react-icons/fa6";
 import { MdGroups } from "react-icons/md";
 import { MdGroup } from "react-icons/md";
 import { IoPersonAdd } from "react-icons/io5";
@@ -19,13 +16,12 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { Link, useNavigate } from "react-router-dom"
-import { Button } from "./ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useQuery } from "@tanstack/react-query"
 import { fetchProfile } from "@/pages/Profile"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { HiOutlineDotsVertical } from "react-icons/hi"
-import { toast, useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import { FaUser } from "react-icons/fa"
 import { FiLogOut } from "react-icons/fi";
 

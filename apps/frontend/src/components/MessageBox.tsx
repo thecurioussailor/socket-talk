@@ -1,7 +1,7 @@
-import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { fetchProfile, UserDetails } from "@/pages/Profile";
@@ -61,7 +61,7 @@ const MessageBox = ({chatId}: {chatId: string | null}) => {
         initialPageParam: null
     })
     
-    const { data: profile, isLoading: profileLoading } = useQuery<UserDetails | null>({
+    const { data: profile } = useQuery<UserDetails | null>({
         queryKey: ["profile"],
         queryFn: fetchProfile
       });

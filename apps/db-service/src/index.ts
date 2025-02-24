@@ -1,8 +1,15 @@
 import { prismaClient } from "@repo/prisma/client";
 import { createClient } from "redis";
+import dotenv from "dotenv";
+dotenv.config();
+
+console.log("REDIS_URL ", process.env.REDIS_URL)
 
 const redisClient = createClient({
-    url: "redis://localhost:6379",
+    socket: {
+        host: "redis",
+        port: 6379
+    }
 });
 
 const queueName = "db_update_message";

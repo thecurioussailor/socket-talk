@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ChangeEvent, useState } from "react";
@@ -39,7 +38,6 @@ const Group = () => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
-    const [search, setSearch] = useState("");
     const { data, isLoading, isError} = useQuery({
         queryKey: ["chats"],
         queryFn: fetchChats

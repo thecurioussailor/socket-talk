@@ -5,7 +5,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "./ui/badge";
 import MessageBox from "./MessageBox";
 import { fetchProfile } from "@/pages/Profile";
-import { Textarea } from "@/components/ui/textarea"
 import { Button } from "./ui/button";
 import { IoSend } from "react-icons/io5";
 import { Input } from "./ui/input";
@@ -14,8 +13,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
 import { FaInfo, FaUser } from "react-icons/fa";
@@ -24,7 +21,7 @@ import ChatParticipantsDialog from "./ChatParticipantsDialog";
 import UserProfileCard from "./UserProfileCard";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
+const WS_URL= import.meta.env.VITE_WS_URL;
 export interface ChatParticipants {
     chatId: string,
     role: "OWNER" | "MEMBER" | "ADMIN"
@@ -104,7 +101,7 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
         enabled: !!chatId,
     })
 
-    const { data: profile, isLoading: profileLoading } = useQuery({
+    const { data: profile } = useQuery({
             queryKey: ["profile"],
             queryFn: fetchProfile
     });
@@ -117,7 +114,7 @@ const ChatBox = ({chatId}: {chatId: string | null}) => {
             return;
         }
 
-        ws.current = new WebSocket('ws://localhost:3001');
+        ws.current = new WebSocket(`${WS_URL}`);
 
         ws.current.onopen = () => {
             console.log("Websocket connected");

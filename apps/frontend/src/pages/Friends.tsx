@@ -83,7 +83,7 @@ const Friends = () => {
         queryFn: fetchFriends
     })
 
-    const {data: friendRequestsData, isError: friendRequestError, isLoading: friendRequestLoading} = useQuery({
+    const {data: friendRequestsData} = useQuery({
         queryKey: ["friendRequests"],
         queryFn: fetchFriendRequests
     })

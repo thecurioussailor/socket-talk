@@ -15,7 +15,7 @@ const ChatTab = ({chatId, isSelected, chatName, image, lastMessage, chatType, on
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                            <p className="text-left text-lg">{chatName}</p>
+                            <p className="text-left text-lg">{chatName}{chatId}</p>
                             {lastMessage && (
                                  <p className="text-left text-xs">{lastMessage.length < 30 ? lastMessage : `${lastMessage.slice(0,30)}...`}</p>
                             )}

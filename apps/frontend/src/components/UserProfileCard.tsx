@@ -1,6 +1,5 @@
 import axios from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import cover from "/cover.jpg";
 import { useQuery } from "@tanstack/react-query";
 import { Instagram, Languages, LocateIcon, Twitter } from "lucide-react";
 import { Button } from "./ui/button";

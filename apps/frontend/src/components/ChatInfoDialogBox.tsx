@@ -6,7 +6,7 @@ import { fetchChatDetails } from "./ChatBox"
 import { Badge } from "./ui/badge"
 
 const ChatInfoDialogBox = ({chatId, onClose}: {chatId: string | null, onClose: () => void}) => {
-  const { data: chatData, isLoading } = useQuery({
+  const { data: chatData } = useQuery({
     queryKey: ["chatDetails", chatId],
     queryFn: () => fetchChatDetails(chatId),
     enabled: !!chatId,

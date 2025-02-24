@@ -34,7 +34,7 @@ const AddParticipantTab = ({ username,name, id, avatar, chatId, onClose}: {usern
                 description: "You have added user successfully to the group chat"
             })
         },
-        onError: (error) => {
+        onError: () => {
             toast({
                 title: "Error while adding participant",
                 description: `Cannot add participant right now. Please try after sometimes`

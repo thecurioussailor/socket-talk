@@ -1,7 +1,5 @@
 import ChatBox from "@/components/ChatBox";
 import ChatTab from "@/components/ChatTab";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query"
@@ -56,7 +54,7 @@ const Chats = () => {
         queryFn: fetchChats
     })
     
-     const { data: profile, isLoading: isProfileLoading} = useQuery<UserDetails | null>({
+     const { data: profile } = useQuery<UserDetails | null>({
             queryKey: ["profile"],
             queryFn: fetchProfile
           });

@@ -45,7 +45,7 @@ export function Signup() {
 
   const mutation = useMutation({
     mutationFn: signupUser,
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: "Signup Successful",
         description: "Your account has been created!",
