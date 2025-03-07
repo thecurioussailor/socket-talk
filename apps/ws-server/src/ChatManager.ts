@@ -1,6 +1,7 @@
 import { createClient, RedisClientType } from "redis";
 import { User } from "./User";
-
+import dotenv from "dotenv";
+dotenv.config();
 export interface DbUserInfo {
     name: string,
     avatar: string,
@@ -19,12 +20,12 @@ export class ChatManager {
 
     private constructor() {
         this.subscriber = createClient({
-            url: "redis://localhost:6379" 
+            url: process.env.REDIS_URL 
         });
         this.subscriber.connect();
 
         this.publisher = createClient({ 
-            url: "redis://localhost:6379"
+            url: process.env.REDIS_URL
         });
         this.publisher.connect();
     }

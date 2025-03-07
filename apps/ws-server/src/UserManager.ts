@@ -1,6 +1,8 @@
 import { WebSocket } from "ws";
 import { User } from "./User";
 import crypto from "crypto";
+import dotenv from "dotenv";
+dotenv.config();
 export class UserManager {
     private static instance: UserManager;
     private users: Map<string, User> = new Map();

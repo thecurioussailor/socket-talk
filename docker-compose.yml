@@ -59,6 +59,7 @@ services:
     restart: always
     env_file:
       - packages/prisma/.env
+      - apps/ws-server/.env
     depends_on:
       http-server:
         condition: service_started
