@@ -14,16 +14,6 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v3
 
-      # 2. (Optional) Debug: List directories to confirm paths
-      - name: List repository structure
-        run: |
-          echo "Root directory:"
-          ls -la
-          echo "apps directory:"
-          ls -la apps
-          echo "http-server directory:"
-          ls -la apps/http-server
-
       # 3. Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -39,7 +29,7 @@ jobs:
       - name: Build and push http-server image
         uses: docker/build-push-action@v4
         with:
-          context: ./apps/http-server
+          context: .
           file: ./apps/http-server/Dockerfile
           push: true
           tags: |
@@ -50,7 +40,7 @@ jobs:
       - name: Build and push ws-server image
         uses: docker/build-push-action@v4
         with:
-          context: ./apps/ws-server
+          context: .
           file: ./apps/ws-server/Dockerfile
           push: true
           tags: |
@@ -61,7 +51,7 @@ jobs:
       - name: Build and push db-service image
         uses: docker/build-push-action@v4
         with:
-          context: ./apps/db-service
+          context: .
           file: ./apps/db-service/Dockerfile
           push: true
           tags: |
@@ -72,7 +62,7 @@ jobs:
       - name: Build and push frontend image
         uses: docker/build-push-action@v4
         with:
-          context: ./apps/frontend
+          context: .
           file: ./apps/frontend/Dockerfile
           push: true
           tags: |
