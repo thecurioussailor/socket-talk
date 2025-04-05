@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: socket-talk
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: ${DOCKERHUB_USERNAME}/frontend:latest
+        ports:
+        - containerPort: 5173
+        envFrom:
+        - secretRef:
+            name: app-secrets

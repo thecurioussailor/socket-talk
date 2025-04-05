@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-server
+  namespace: socket-talk
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: http-server
+  template:
+    metadata:
+      labels:
+        app: http-server
+    spec:
+      containers:
+      - name: http-server
+        image: ${DOCKERHUB_USERNAME}/http-server:latest
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - secretRef:
+            name: app-secrets
