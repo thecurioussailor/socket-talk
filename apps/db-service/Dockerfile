@@ -19,6 +19,8 @@ WORKDIR /app
 
 COPY apps/db-service/ apps/db-service/
 
+WORKDIR /app/apps/db-service
+
 RUN pnpm --filter db-service run build
 
 CMD ["pnpm", "--filter", "db-service", "run", "start"]
